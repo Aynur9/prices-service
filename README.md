@@ -356,8 +356,7 @@ springdoc:
 Proyecto desarrollado como ejercicio técnico para demostrar:
 - Diseño de arquitectura limpia
 - Buenas prácticas de desarrollo
-- Testing exhaustivo
-- Documentación profesional
+- Testing 
 
 ## 📄 Licencia
 
