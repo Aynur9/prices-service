@@ -31,27 +31,40 @@ import lombok.ToString;
 public class Price {
     /** Identificador de la cadena/marca (ej: 1 = ZARA) */
     private Long brandId;
-    
     /** Identificador del producto */
     private Long productId;
-    
     /** Fecha y hora de inicio de aplicación del precio */
     private LocalDateTime start;
-    
     /** Fecha y hora de fin de aplicación del precio */
     private LocalDateTime end;
-    
     /** Prioridad para desambiguación. Mayor valor = mayor prioridad */
     private Integer priority;
-    
     /** Precio final de venta (PVP) */
     private BigDecimal price;
-    
     /** Código ISO de la moneda (ej: EUR, USD) */
     private String currency;
-    
     /** Identificador de la tarifa de precios */
     private Integer priceList;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Price priceObj = (Price) o;
+        return java.util.Objects.equals(brandId, priceObj.brandId)
+                && java.util.Objects.equals(productId, priceObj.productId)
+                && java.util.Objects.equals(start, priceObj.start)
+                && java.util.Objects.equals(end, priceObj.end)
+                && java.util.Objects.equals(priority, priceObj.priority)
+                && java.util.Objects.equals(price, priceObj.price)
+                && java.util.Objects.equals(currency, priceObj.currency)
+                && java.util.Objects.equals(priceList, priceObj.priceList);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(brandId, productId, start, end, priority, price, currency, priceList);
+    }
 
     /**
      * Constructor alternativo sin el campo priority.

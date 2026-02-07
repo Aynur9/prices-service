@@ -2,6 +2,7 @@ package com.zara.prices.infrastructure.persistence;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+// Limpieza: imports agrupados
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
@@ -16,29 +17,19 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Entidad JPA que representa la tabla PRICES en la base de datos.
- * 
- * <p>Esta clase mapea la estructura de la tabla de base de datos que almacena
- * las tarifas de precios con sus rangos de fechas de aplicación y prioridades.</p>
- * 
- * <p>Estructura de la tabla:</p>
- * <ul>
- *   <li>ID: Clave primaria autogenerada</li>
- *   <li>BRAND_ID: FK a la cadena/marca</li>
- *   <li>PRODUCT_ID: Identificador del producto</li>
- *   <li>PRICE_LIST: Identificador de la tarifa</li>
- *   <li>START_DATE/END_DATE: Rango de vigencia</li>
- *   <li>PRIORITY: Desambiguador (mayor valor = mayor prioridad)</li>
- *   <li>PRICE: Precio final de venta</li>
- *   <li>CURRENCY: Código ISO de moneda</li>
- * </ul>
- * 
- *  @author Eduardo Pindado Aguilar
- * @version 1.0
- * @since 2026-01-26
+ * Entidad de infraestructura para persistencia.
+ * <p>Su único rol es mapear la tabla PRICES a un objeto Java.
+ * <p>No contiene lógica de negocio ni reglas de aplicación.
  */
 @Entity
-@Table(name = "PRICES")
+@Table(
+    name = "PRICES",
+    indexes = {
+        @jakarta.persistence.Index(name = "idx_brand_product", columnList = "BRAND_ID,PRODUCT_ID"),
+        @jakarta.persistence.Index(name = "idx_start_date", columnList = "START_DATE"),
+        @jakarta.persistence.Index(name = "idx_end_date", columnList = "END_DATE")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor

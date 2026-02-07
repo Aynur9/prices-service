@@ -6,18 +6,10 @@ import java.util.List;
 import com.zara.prices.domain.model.Price;
 
 /**
- * Servicio de dominio que encapsula la lógica de negocio relacionada con precios.
- * 
- * <p>Este servicio contiene las reglas de negocio puras, sin dependencias de
- * infraestructura. Implementa la lógica de selección de precios aplicables
- * cuando existen múltiples opciones.</p>
- * 
- * <p>Regla principal: Cuando hay varios precios aplicables para un producto
- * en una fecha, se selecciona aquel con el valor más alto en el campo {@code priority}.</p>
- * 
- *  @author Eduardo Pindado Aguilar
- * @version 1.0
- * @since 2026-01-26
+ * Servicio de dominio para selección de precios aplicables.
+ * <p>Reglas de negocio puras, sin dependencias externas.
+ * <p>Regla principal: Selecciona el precio de mayor prioridad entre múltiples tarifas.
+ * <p>Devuelve PriceNotFoundException si no hay precios válidos.
  */
 public class PriceDomainService {
     
@@ -32,8 +24,11 @@ public class PriceDomainService {
      * @throws PriceNotFoundException si la lista está vacía
      */
     public Price selectHighestPriority(List<Price> prices) {
+        if (prices == null || prices.isEmpty()) {
+            throw new PriceNotFoundException("No hay precios aplicables para los parámetros proporcionados");
+        }
         return prices.stream()
                 .max(Comparator.comparing(Price::getPriority))
-                .orElseThrow(() -> new PriceNotFoundException());
+                .orElseThrow(() -> new PriceNotFoundException("No hay precios aplicables para los parámetros proporcionados"));
     }
 }

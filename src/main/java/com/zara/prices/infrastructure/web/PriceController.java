@@ -4,10 +4,14 @@ import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+// Limpieza: imports agrupados y sin duplicados
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import com.zara.prices.domain.model.Price;
 import com.zara.prices.domain.port.in.GetApplicablePriceUseCase;
@@ -22,28 +26,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * Controlador REST para operaciones relacionadas con precios.
- * 
- * <p>Este controlador expone endpoints HTTP para consultar precios aplicables.
- * Actúa como adaptador REST en la arquitectura hexagonal, traduciendo
- * peticiones HTTP a llamadas al caso de uso de dominio.</p>
- * 
- * <p>Responsabilidades:</p>
- * <ul>
- *   <li>Validar y parsear parámetros HTTP</li>
- *   <li>Delegar lógica de negocio al caso de uso</li>
- *   <li>Convertir entidades de dominio a DTOs de respuesta</li>
- *   <li>Manejar excepciones y retornar códigos HTTP apropiados</li>
- * </ul>
- * 
- * <p>Endpoint base: {@code /prices}</p>
- * 
- *  @author Eduardo Pindado Aguilar
- * @version 1.0
- * @since 2026-01-26
+ * Adaptador REST de infraestructura.
+ * <p>Su único rol es traducir peticiones HTTP a llamadas al caso de uso del dominio.
+ * <p>Valida parámetros, delega la lógica y convierte la respuesta a DTO.
+ * <p>No contiene lógica de negocio ni reglas de aplicación.
+ * <p>Endpoint base: {@code /prices}
  */
 @RestController
 @RequestMapping("/prices")
+@Validated
 @Tag(name = "Precios", description = "API de consulta de precios aplicables a productos")
 public class PriceController {
 
@@ -172,7 +163,7 @@ public class PriceController {
             example = "1",
             schema = @Schema(type = "integer", format = "int64")
         )
-        @RequestParam Long brandId,
+        @RequestParam @NotNull @Positive Long brandId,
         
         @Parameter(
             name = "productId",
@@ -181,7 +172,7 @@ public class PriceController {
             example = "35455",
             schema = @Schema(type = "integer", format = "int64")
         )
-        @RequestParam Long productId,
+        @RequestParam @NotNull @Positive Long productId,
         
         @Parameter(
             name = "date",
@@ -190,7 +181,7 @@ public class PriceController {
             example = "2020-06-14T10:00:00",
             schema = @Schema(type = "string", format = "date-time", pattern = "yyyy-MM-dd'T'HH:mm:ss")
         )
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+        @RequestParam @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
 
         // Ejecutar caso de uso
         Price price = useCase.get(brandId, productId, date);

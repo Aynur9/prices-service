@@ -45,10 +45,11 @@ public class GetApplicablePriceService implements GetApplicablePriceUseCase {
      * Constructor con inyección de dependencias.
      * 
      * @param repository implementación del repositorio de precios
+     * @param domain servicio de dominio para selección de precios
      */
-    public GetApplicablePriceService(PriceRepository repository) {
+    public GetApplicablePriceService(PriceRepository repository, PriceDomainService domain) {
         this.repository = repository;
-        this.domain = new PriceDomainService();
+        this.domain = domain;
     }
 
     /**

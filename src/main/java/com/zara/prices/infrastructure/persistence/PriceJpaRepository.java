@@ -2,7 +2,8 @@ package com.zara.prices.infrastructure.persistence;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,8 +20,8 @@ import org.springframework.data.repository.query.Param;
  *   <li>Ordenar por prioridad descendente para obtener primero el de mayor prioridad</li>
  *   <li>Utilizar índices automáticos en las columnas de búsqueda</li>
  * </ul>
- * 
- *  @author Eduardo Pindado Aguilar
+ *
+ * @author Eduardo Pindado Aguilar
  * @version 1.0
  * @since 2026-01-26
  */
@@ -50,5 +51,23 @@ public interface PriceJpaRepository extends JpaRepository<PriceEntity, Long> {
         @Param("brandId") Long brandId,
         @Param("productId") Long productId,
         @Param("date") LocalDateTime date
+    );
+
+    /**
+     * Consulta paginada y proyectada para escenarios de alta carga.
+     * Solo trae los campos necesarios usando PriceApplicableDTO.
+     *
+     * @param brandId identificador de la cadena
+     * @param productId identificador del producto
+     * @param date fecha para verificar aplicabilidad
+     * @param pageable información de paginación
+     * @return página de precios aplicables con proyección
+     */
+    @Query("SELECT p.brandId as brandId, p.productId as productId, p.startDate as startDate, p.endDate as endDate, p.priority as priority, p.price as price, p.currency as currency, p.priceList as priceList FROM PriceEntity p WHERE p.brandId = :brandId AND p.productId = :productId AND :date BETWEEN p.startDate AND p.endDate ORDER BY p.priority DESC")
+    Page<PriceApplicableDTO> findApplicableProjected(
+        @Param("brandId") Long brandId,
+        @Param("productId") Long productId,
+        @Param("date") LocalDateTime date,
+        Pageable pageable
     );
 }

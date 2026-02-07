@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.zara.prices.application.GetApplicablePriceService;
 import com.zara.prices.domain.port.in.GetApplicablePriceUseCase;
 import com.zara.prices.domain.port.out.PriceRepository;
+import com.zara.prices.domain.service.PriceDomainService;
 
 /**
  * Clase de configuración de Spring para el módulo de precios.
@@ -29,16 +30,27 @@ import com.zara.prices.domain.port.out.PriceRepository;
 public class PriceConfiguration {
 
     /**
+     * Configura e instancia el servicio de dominio para selección de precios.
+     * 
+     * @return instancia del servicio de dominio
+     */
+    @Bean
+    public PriceDomainService priceDomainService() {
+        return new PriceDomainService();
+    }
+
+    /**
      * Configura e instancia el caso de uso para obtener precios aplicables.
      * 
      * <p>Este bean conecta el puerto de entrada (interfaz del caso de uso)
      * con su implementación, inyectando las dependencias necesarias.</p>
      * 
      * @param priceRepository implementación del puerto de salida (inyectada por Spring)
+     * @param priceDomainService servicio de dominio (inyectado por Spring)
      * @return instancia del caso de uso lista para ser utilizada
      */
     @Bean
-    public GetApplicablePriceUseCase getApplicablePriceUseCase(PriceRepository priceRepository) {
-        return new GetApplicablePriceService(priceRepository);
+    public GetApplicablePriceUseCase getApplicablePriceUseCase(PriceRepository priceRepository, PriceDomainService priceDomainService) {
+        return new GetApplicablePriceService(priceRepository, priceDomainService);
     }
 }
