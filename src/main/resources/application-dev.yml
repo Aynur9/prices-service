@@ -1,0 +1,89 @@
+# ============================================================================
+# DEVELOPMENT PROFILE CONFIGURATION
+# ============================================================================
+# Local development environment with in-memory H2 database
+# Enable: mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
+# ============================================================================
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:pricesdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:  # Empty password for local development
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop  # Recreate schema on startup
+    
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+    
+    defer-datasource-initialization: true
+  
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+
+# Enhanced logging for development
+logging:
+  level:
+    root: INFO
+    org.hibernate: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    com.zara.prices: DEBUG
+  
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%-5level] %logger{36} - %msg%n"
+
+# Enable Swagger/OpenAPI UI for API exploration
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+# Server settings for development
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: always
+    include-exception: false
+
+# Actuator endpoints fully exposed for debugging
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,env,configprops
+  endpoint:
+    health:
+      show-details: always
+    env:
+      enabled: true
+
+# Development-specific application properties
+app:
+  environment: development
+  api:
+    version: 1.0.0-dev

@@ -1,34 +1,62 @@
 spring:
+  application:
+    name: prices-service
+  
+  # Default configuration (overridden by active profile)
   datasource:
     url: jdbc:h2:mem:pricesdb
     driver-class-name: org.h2.Driver
     username: sa
-    password: password
+    password: 
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: true
+  
   h2:
     console:
-      enabled: true
-      path: /h2
+      enabled: false
+      path: /h2-console
+  
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create
-    show-sql: true
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
-    defer-datasource-initialization: true
+        format_sql: false
+        jdbc:
+          fetch_size: 25
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+    defer-datasource-initialization: false
+  
   sql:
     init:
-      mode: always
-      data-locations: classpath:data.sql
+      mode: never
+      continue-on-error: false
 
-# Configuración de Swagger/OpenAPI
+logging:
+  level:
+    root: INFO
+    org.hibernate: WARN
+    org.hibernate.SQL: WARN
+    org.springframework: INFO
+    org.springframework.web: INFO
+    com.zara.prices: INFO
+
 springdoc:
   api-docs:
     path: /v3/api-docs
-    enabled: true
+    enabled: false
   swagger-ui:
     path: /swagger-ui.html
-    enabled: true
+    enabled: false
     operationsSorter: method
     tagsSorter: alpha
     displayRequestDuration: true
@@ -39,3 +67,27 @@ springdoc:
     showExtensions: false
     showCommonExtensions: false
   show-actuator: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types:
+      - application/json
+      - application/xml
+      - text/html
+      - text/plain
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: when-authorized
+

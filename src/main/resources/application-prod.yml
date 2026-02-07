@@ -1,0 +1,127 @@
+# ============================================================================
+# PRODUCTION PROFILE CONFIGURATION
+# ============================================================================
+# Production environment with optimized settings for performance and security
+# Enable: SPRING_PROFILE=prod
+# ============================================================================
+
+spring:
+  datasource:
+    # Must be configured via environment variables in production
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/prices}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: "SELECT 1"
+      auto-commit: true
+      leak-detection-threshold: 60000
+  
+  h2:
+    console:
+      enabled: false  # Never enable H2 console in production
+  
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate  # Only validate schema, never auto-create
+    
+    show-sql: false  # Never show SQL in production
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 25
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+        # Connection pooling
+        connection:
+          provider_class: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+        # Performance tuning
+        enable_lazy_load_no_trans: false
+    
+    open-in-view: false  # Prevent N+1 queries
+  
+  sql:
+    init:
+      mode: never  # Never auto-initialize in production
+
+# Minimal logging in production - only errors and critical info
+logging:
+  level:
+    root: WARN
+    org.hibernate: WARN
+    org.springframework: WARN
+    org.springframework.web: ERROR
+    com.zara.prices: INFO
+  
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  
+  file:
+    name: /var/log/prices-service/application.log
+    max-size: 10MB
+    max-history: 30
+    total-size-cap: 1GB
+
+# Disable Swagger in production for security
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Production server settings
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:/}
+  
+  compression:
+    enabled: true
+    min-response-size: 1024
+    mime-types:
+      - application/json
+      - application/xml
+      - text/html
+      - text/plain
+  
+  shutdown: graceful
+  shutdown-wait-time: 30s
+  
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    accept-count: 100
+    max-connections: 10000
+    connection-timeout: 20000
+
+# Only expose health endpoint in production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+    shutdown:
+      enabled: true
+  
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Production application settings
+app:
+  environment: production
+  api:
+    version: 1.0.0

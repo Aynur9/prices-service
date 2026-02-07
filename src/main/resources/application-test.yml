@@ -1,0 +1,79 @@
+# ============================================================================
+# TEST PROFILE CONFIGURATION
+# ============================================================================
+# Testing environment with in-memory H2 database
+# Automatically activated when running tests via Maven/IDE
+# ============================================================================
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:  # No password in test
+    hikari:
+      maximum-pool-size: 2
+      minimum-idle: 1
+  
+  h2:
+    console:
+      enabled: false  # Disable H2 console in tests
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop  # Create and drop schema for each test
+    
+    show-sql: false  # Don't show SQL in test output
+    properties:
+      hibernate:
+        format_sql: false
+    
+    defer-datasource-initialization: true
+  
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+      continue-on-error: false
+
+# Minimal logging for test output clarity
+logging:
+  level:
+    root: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: WARN
+    org.springframework: WARN
+    org.springframework.web: WARN
+    org.springframework.test: WARN
+    com.zara.prices: INFO
+  
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%-5level] %logger{36} - %msg%n"
+
+# Disable Swagger in test
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Server configuration for tests
+server:
+  port: 0  # Random port for parallel test execution
+
+# Minimize actuator exposure in tests
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+# Test-specific settings
+app:
+  environment: test
+  api:
+    version: 1.0.0-test
