@@ -6,57 +6,90 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/) y el 
 
 ---
 
-## [1.0.0] - 2026-02-07
+## [1.1.0] - 2026-02-07
 
-### 🎉 Cambios Iniciales - Primera Release Productiva
+### 🎯 Mejoras en Configuración Multi-Entorno
 
 #### ✨ Agregado
 
-- **Arquitectura Hexagonal**: Implementación completa del patrón Ports & Adapters
-  - Separación clara entre capas (application, domain, infrastructure)
-  - Interfaces de puertos bien definidas para la persistencia
-  
-- **Servicio de Precios Completo**: API REST para consultar precios aplicables
-  - Endpoint: `GET /prices?brandId={id}&productId={id}&date={date}`
-  - Soporta consultas por marca, producto y fecha
-  - Respuesta con información completa del precio (lista, prioridad, rango vigente)
+- **Spring Profiles para gestión de entornos**:
+  - Perfil `dev`: Desarrollo local con H2, Swagger habilitado, logging DEBUG
+  - Perfil `test`: Testing automático con H2 aislado, logging WARN, puerto aleatorio
+  - Perfil `prod`: Producción con PostgreSQL, graceful shutdown, metrics/Prometheus
 
-- **Optimizaciones para Alta Carga**:
-  - Método de proyección `findApplicableProjected()` para escenarios de alta concurrencia
-  - Paginación mediante Spring Data JPA
-  - DTOs para reducir footprint de memoria
-  - Índices de base de datos en columnas de búsqueda (brandId, productId)
+- **Archivos de configuración profesionales**:
+  - `application.yml`: Base común con sensible defaults
+  - `application-dev.yml`: Configuración para desarrollo local
+  - `application-test.yml`: Configuración para testing automático
+  - `application-prod.yml`: Configuración optimizada para producción
 
-- **Validaciones Robustas**:
-  - Anotaciones Jakarta Validation: `@NotNull`, `@Positive`
-  - Handler global de excepciones con respuestas HTTP consistentes
-  - Mensajes de error descriptivos para cada caso
+- **Seguridad y externalización**:
+  - Todas las credenciales externalizadas en variables de entorno
+  - Sin hardcoding de contraseñas
+  - Soporte para múltiples bases de datos (H2, PostgreSQL)
+  - Fallbacks seguros a configuración por defecto
 
-- **Documentación OpenAPI/Swagger**:
-  - Documentación automática de API con `springdoc-openapi`
-  - Ejemplos de request/response para cada endpoint
-  - Modelos de respuesta claramente definidos
+- **Optimizaciones de rendimiento**:
+  - Connection pooling (Hikari) optimizado por entorno
+  - Dev/Test: 2-5 conexiones
+  - Prod: 20-30 conexiones configurables
+  - Batch processing y ordering de inserts en Hibernate
 
-- **Cobertura de Tests Completa**:
-  - 26 tests unitarios e integración (100% pasando)
-  - Coverage en servicios, controladores, repositorios y dominio
-  - Tests con JUnit 5 y Mockito
-  - Datos de prueba con script SQL
+- **Documentación completa** (`CONFIGURATION.md`):
+  - Guía de variables de entorno
+  - Cómo ejecutar en cada perfil
+  - Ejemplos de Docker y Kubernetes
+  - Troubleshooting detallado
+  - Configuración de logging por componente
 
-- **Configuración Profesional**:
-  - H2 como base de datos en memoria para desarrollo y testing
-  - Propiedades configurables via `application.yml`
-  - Logging estructurado con niveles apropiados
-  - Gestión de transacciones automática
+- **Control de logging granular**:
+  - Configuración por perfil (DEBUG en dev, WARN en test, ERROR en prod)
+  - Logs a archivo en producción con rotación automática
+  - Patterns de formato personalizados por entorno
 
-- **Estándares de Código**:
-  - SOLID principles implementados
-  - Convenciones de nombres consistentes
-  - Documentación Javadoc en métodos públicos
-  - Formato de código con indentación consistente
+- **Mejoría en tests**:
+  - `@ActiveProfiles("test")` en `PriceControllerTest`
+  - Aislamiento correcto de configuración de tests
+  - Database por test completamente aislada
 
-#### 🔧 Técnico
+#### 🔧 Cambios Técnicos
 
+- Servidor Java: 21 LTS
+- Spring Boot: 3.4.0
+- Spring Data JPA
+- Hibernate: 6.6.2
+- Hikari Connection Pool
+- H2 (desarrollo/test) y PostgreSQL (producción)
+
+#### ✅ Mejoras
+
+- Configuración más limpia y mantenible
+- Separación clara entre entornos
+- Database agnostic (portable a múltiples BD)
+- Production-ready (graceful shutdown, metrics, logging)
+- Documentado y ejemplificado para cada escenario
+- 26/26 tests pasando con configuración optimizada
+
+---
+
+## [1.0.0] - 2026-02-07
+
+Se han revisado y mejorad los siguientes puntos:
+
+**Principios SOLID**
+    Se revisan principios fundamentales como Responsabilidad Única e Inversión de Dependencias.
+
+**Arquitectura**
+    Revisión de infraestrucutra en lo relativo a separación de responsabilidades. Mejora de comentarios dentro de las clases.
+    
+**Eficiencia**
+    Mejorada la escalabilidad del producto para entornos con alta carga.
+    Mejorada complejidad de algunos puntos.
+    
+**Testing**
+    Correcciones y mejoras en clases testing.
+
+#### Arquitectura Técnica
 - **Stack**: Spring Boot 3.4.0, Spring Data JPA, Hibernate 6.6.2
 - **Java**: Versión 21 LTS
 - **Base de Datos**: H2 (en memoria), compatible con PostgreSQL
@@ -66,34 +99,31 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/) y el 
 ---
 
 ## [0.1.0] - 2026-01-26
-
-### 🔨 Fase Inicial de Desarrollo
-
-#### ✨ Agregado
-
+### Fase Inicial de Desarrollo
+#### Agregado
 - Estructura básica del proyecto Spring Boot
 - Entidad `Price` con campos de dominio
 - Controlador REST inicial
 - Repositorio JPA básico
 - Excepciones de dominio (`PriceNotFoundException`)
 
-#### 🐛 Corregido
-
+#### Corregido
 - Validaciones de parámetros nulos en controlador
 - Manejo de excepciones mejorado
 - Formato de respuestas consistente
 
----
 
 ## Notas sobre Versiones Futuras
 
-### v1.1.0 (Próxima)
+### v1.2.0 (Próxima)
 
 Características planeadas:
-- [ ] Caché en memoria para precios consultados frecuentemente
+- [ ] Caché en memoria para precios consultados frecuentemente (Redis)
 - [ ] Búsqueda avanzada con filtros adicionales
-- [ ] Auditoría de cambios de precios
+- [ ] Auditoría de cambios de precios con historial
 - [ ] API de administración para gestionar precios
+- [ ] Validación de integridad referencial
+- [ ] Rate limiting y throttling
 
 ### v2.0.0 (Futuro)
 
@@ -102,31 +132,11 @@ Mejoras mayores planeadas:
 - [ ] Sistema de descuentos por volumen
 - [ ] Predicción de demanda basada en ML
 - [ ] GraphQL como alternativa a REST
-
----
-
-## Guía de Contribución
-
-Para detalles sobre cómo contribuir, ver [CONTRIBUTING.md](./CONTRIBUTING.md)
-
-Resumen rápido:
-- Usa commits semánticos: `feat:`, `fix:`, `docs:`, etc.
-- Crea ramas: `feature/`, `bugfix/`, `hotfix/`
-- PR con descripción clara
-- Tests pasando es obligatorio
-
----
-
-## Historial Detallado
-
-Para ver el historial completo de commits:
-```bash
-git log --oneline
-git log --format="%H %s %b"
-```
+- [ ] Event-driven architecture con Kafka
+- [ ] Microservicios separados por dominio
 
 ---
 
 **Última actualización**: 7 de febrero de 2026  
-**Versión actual**: 1.0.0  
+**Versión actual**: 1.1.0  
 **Estado**: Productivo ✅
