@@ -2,6 +2,7 @@ package com.zara.prices.domain.port.out;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import com.zara.prices.domain.model.Price;
 
@@ -33,6 +34,24 @@ public interface PriceRepository {
      * @param date fecha para la cual se buscan precios aplicables
      * @return lista de precios aplicables, ordenados por prioridad descendente
      *         (puede estar vacía si no hay precios aplicables)
+     * @deprecated usar {@link #findHighestPriorityApplicable(Long, Long, LocalDateTime)} para mejor eficiencia
      */
+    @Deprecated(since = "2.0")
     List<Price> findApplicable(Long brandId, Long productId, LocalDateTime date);
+
+    /**
+     * Busca el precio de mayor prioridad aplicable para un producto de una cadena en una fecha.
+     * 
+     * <p>Retorna directamente el precio de mayor prioridad, optimizando la extracción de datos
+     * en la consulta. Evita traer múltiples registros y procesamiento adicional en memoria.</p>
+     * 
+     * <p>Regla de desambiguación: cuando múltiples tarifas coinciden en un rango de fechas,
+     * se retorna la de mayor prioridad (mayor valor numérico).</p>
+     * 
+     * @param brandId identificador de la cadena
+     * @param productId identificador del producto
+     * @param date fecha para la cual se busca el precio de mayor prioridad
+     * @return Optional con el precio de mayor prioridad, o vacío si no hay precios aplicables
+     */
+    Optional<Price> findHighestPriorityApplicable(Long brandId, Long productId, LocalDateTime date);
 }

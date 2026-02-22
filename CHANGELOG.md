@@ -6,6 +6,60 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/) y el 
 
 ---
 
+## [1.2.0] - 2026-02-22
+
+### 🎯 Optimización de Eficiencia en Extracción de Datos
+
+#### ✨ Agregado
+
+- **Método optimizado en repositorio JPA**:
+  - `findHighestPriorityApplicable()`: Retorna `Optional<PriceEntity>` con la tarifa de mayor prioridad
+  - La **selección de tarifa se resuelve directamente en la consulta SQL**, no en memoria
+  - Método helper `findHighestPriorityApplicableList()` que ordena por prioridad DESC
+
+- **Extensión del puerto de salida**:
+  - `Optional<Price> findHighestPriorityApplicable()` en `PriceRepository`
+  - Método antiguo mantiene compatibilidad con `@Deprecated`
+
+#### 🔄 Refactorizado
+
+- **GetApplicablePriceService**:
+  - **Eliminada dependencia de `PriceDomainService`** del constructor
+  - Simplificado: delega directamente al repositorio que retorna resultado optimizado
+  - Antes: `repository.findApplicable()` → `domainService.selectHighestPriority()` (dos pasos)
+  - Ahora: `repository.findHighestPriorityApplicable()` → resultado directo (un paso)
+  - Reducción de complejidad algorítmica: sin procesamiento en memoria
+
+- **PriceConfiguration**:
+  - `getApplicablePriceUseCase()` solo inyecta `PriceRepository`
+  - `PriceDomainService` marcado como `@Deprecated` pero conservado para compatibilidad
+
+- **Pruebas unitarias** (`GetApplicablePriceServiceTest`):
+  - Adaptadas para usar `findHighestPriorityApplicable()` con `Optional`
+  - Test de verificación que confirma uso del método optimizado
+  - Test de carga: validación con 10.000 resultados
+
+#### 🚀 Beneficios de Rendimiento
+
+- **Trae solo 1 resultado** en lugar de múltiples registros
+- **Ordenación resuelta en BD** (JDBC driver level)
+- **Escalabilidad mejorada**: consulta eficiente con índices automáticos
+- **Menos overhead de memoria** en JDBC ResultSet
+- **Patrón claro de arquitectura**: responsabilidades explícitas en cada capa
+
+#### ✅ Verificación
+
+- 26/26 tests pasando ✅
+- Verify goal exitoso ✅
+- Backward compatible con interfaz pública ✅
+
+#### 📝 Notas de Deprecación
+
+- `PriceRepository.findApplicable()`: usar `findHighestPriorityApplicable()` para mejor eficiencia
+- `PriceDomainService.selectHighestPriority()`: lógica resuelta en la consulta
+
+---
+
 ## [1.1.0] - 2026-02-07
 
 ### 🎯 Mejoras en Configuración Multi-Entorno

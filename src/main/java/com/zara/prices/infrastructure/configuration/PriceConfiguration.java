@@ -23,8 +23,8 @@ import com.zara.prices.domain.service.PriceDomainService;
  * </ul>
  * 
  *  @author Eduardo Pindado Aguilar
- * @version 1.0
- * @since 2026-01-26
+ * @version 2.0
+ * @since 2026-02-22
  */
 @Configuration
 public class PriceConfiguration {
@@ -32,8 +32,13 @@ public class PriceConfiguration {
     /**
      * Configura e instancia el servicio de dominio para selección de precios.
      * 
+     * <p>Se mantiene como bean para posibles usos futuros y compatibilidad con tests.</p>
+     * 
      * @return instancia del servicio de dominio
+     * @deprecated Este servicio ya no se usa en la capa de aplicación.
+     *             La lógica de selección se resuelve eficientemente en la consulta al repositorio.
      */
+    @Deprecated(since = "2.0")
     @Bean
     public PriceDomainService priceDomainService() {
         return new PriceDomainService();
@@ -45,12 +50,14 @@ public class PriceConfiguration {
      * <p>Este bean conecta el puerto de entrada (interfaz del caso de uso)
      * con su implementación, inyectando las dependencias necesarias.</p>
      * 
+     * <p>Versión optimizada: el repositorio retorna directamente el precio de mayor prioridad,
+     * evitando procesamiento adicional en memoria.</p>
+     * 
      * @param priceRepository implementación del puerto de salida (inyectada por Spring)
-     * @param priceDomainService servicio de dominio (inyectado por Spring)
      * @return instancia del caso de uso lista para ser utilizada
      */
     @Bean
-    public GetApplicablePriceUseCase getApplicablePriceUseCase(PriceRepository priceRepository, PriceDomainService priceDomainService) {
-        return new GetApplicablePriceService(priceRepository, priceDomainService);
+    public GetApplicablePriceUseCase getApplicablePriceUseCase(PriceRepository priceRepository) {
+        return new GetApplicablePriceService(priceRepository);
     }
 }

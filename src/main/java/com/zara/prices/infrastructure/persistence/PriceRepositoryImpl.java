@@ -2,6 +2,7 @@ package com.zara.prices.infrastructure.persistence;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,11 +43,25 @@ public class PriceRepositoryImpl implements PriceRepository {
     /**
      * {@inheritDoc}
      * 
+     * <p>Implementación optimizada que delega la consulta a Spring Data JPA y convierte
+     * la entidad JPA a objeto de dominio. Trae solo el resultado de mayor prioridad.</p>
+     */
+    @Override
+    public Optional<Price> findHighestPriorityApplicable(Long brandId, Long productId, LocalDateTime date) {
+        return priceJpaRepository.findHighestPriorityApplicable(brandId, productId, date)
+                .map(priceJpaMapper::toDomain);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * <p>Implementación que delega la consulta a Spring Data JPA y convierte
      * las entidades JPA a objetos de dominio.</p>
+     * 
+     * @deprecated usar {@link #findHighestPriorityApplicable(Long, Long, LocalDateTime)} para mejor eficiencia
      */
-
     @Override
+    @Deprecated(since = "2.0")
     public List<Price> findApplicable(Long brandId, Long productId, LocalDateTime date) {
         // Consultar base de datos y convertir entidades JPA a dominio usando el mapper
         return priceJpaRepository.findByBrandIdAndProductIdAndDateBetween(brandId, productId, date)
@@ -54,7 +69,6 @@ public class PriceRepositoryImpl implements PriceRepository {
                 .map(priceJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
-    // Conversión delegada al mapper
 
         /**
      * Consulta eficiente para escenarios de alta carga: paginada y proyectada.
